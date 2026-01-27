@@ -1,0 +1,32 @@
+{
+  "name": "list-token",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "env-cmd -f ../.env.local ts-node src/example.ts",
+    "fund-wallet": "env-cmd -f ../.env.local ts-node src/fund-wallet.ts",
+    "get-wallet": "env-cmd -f ../.env.local ts-node src/get-wallet-info.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "env-cmd": "^11.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@metaplex-foundation/js": "^0.20.1",
+    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@metaplex-foundation/umi": "^1.4.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.4.1",
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.98.4"
+  },
+  "overrides": {
+    "axios": "1.12.2",
+    "form-data": "4.0.4"
+  }
+}
