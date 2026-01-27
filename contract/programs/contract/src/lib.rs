@@ -1,17 +1,10 @@
 use anchor_lang::prelude::*;
-use anchor_lang::system_program;
 use anchor_lang::solana_program::program_option::COption;
+use anchor_lang::system_program;
 
-use anchor_spl::token_interface::{
-    self,
-    Mint,
-    TokenAccount,
-    MintTo,
-    Transfer,
-    TokenInterface,
-};
+use anchor_spl::token_interface::{self, Mint, MintTo, TokenAccount, TokenInterface, Transfer};
 
-declare_id!("2NszZaqQu9zn6u51ionxw4MwiRURSaZ1px3bKrds8VAS");
+declare_id!("8164xbGNA6MzDC5Sk6oMX2gDTMLEUmHcAExxqmfJx7rX");
 
 #[program]
 pub mod list_contract {
@@ -53,8 +46,7 @@ pub mod list_contract {
         let mint_amount = tokens_ui * scale;
 
         require!(
-            ctx.accounts.mint.mint_authority
-                == COption::Some(ctx.accounts.mint_authority.key()),
+            ctx.accounts.mint.mint_authority == COption::Some(ctx.accounts.mint_authority.key()),
             ListError::InvalidMintAuthority
         );
 
@@ -178,10 +170,7 @@ pub mod list_contract {
         Ok(())
     }
 
-    pub fn settle_click_campaign(
-        ctx: Context<SettleClickCampaign>,
-        amount: u64,
-    ) -> Result<()> {
+    pub fn settle_click_campaign(ctx: Context<SettleClickCampaign>, amount: u64) -> Result<()> {
         require!(amount > 0, ListError::InvalidAmount);
 
         let seeds = &[
