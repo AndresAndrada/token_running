@@ -1,10 +1,20 @@
+#![allow(deprecated)]
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::program_option::COption;
 use anchor_lang::system_program;
+use anchor_lang::solana_program::sysvar::instructions::{
+    load_current_index_checked, load_instruction_at_checked,
+};
+// Agregamos TransferHookInstruction aquí
+use spl_transfer_hook_interface::instruction::{ExecuteInstruction, TransferHookInstruction}; 
+use spl_tlv_account_resolution::{
+    account::ExtraAccountMeta, state::ExtraAccountMetaList,
+};
 
 use anchor_spl::token_interface::{self, Mint, MintTo, TokenAccount, TokenInterface, Transfer};
 
-declare_id!("8164xbGNA6MzDC5Sk6oMX2gDTMLEUmHcAExxqmfJx7rX");
+// Tu ID original
+declare_id!("2NszZaqQu9zn6u51ionxw4MwiRURSaZ1px3bKrds8VAS");
 
 #[program]
 pub mod list_contract {
@@ -195,6 +205,81 @@ pub mod list_contract {
 
         Ok(())
     }
+
+    /* ================= HOOK ================= */
+
+    pub fn initialize_extra_account_meta_list(
+        ctx: Context<InitializeExtraAccountMetaList>,
+    ) -> Result<()> {
+        let account_metas = vec![
+            ExtraAccountMeta::new_with_pubkey(
+                &anchor_lang::solana_program::sysvar::instructions::ID, 
+                false, 
+                false, 
+            )?,
+        ];
+
+        let account_data_size = ExtraAccountMetaList::size_of(account_metas.len())? as u64;
+        let lamports = Rent::get()?.minimum_balance(account_data_size as usize);
+
+        let mint = ctx.accounts.mint.key();
+        let signer_seeds: &[&[&[u8]]] = &[&[
+            b"extra-account-metas",
+            mint.as_ref(),
+            &[ctx.bumps.extra_account_meta_list],
+        ]];
+
+        anchor_lang::system_program::create_account(
+            CpiContext::new_with_signer(
+                ctx.accounts.system_program.to_account_info(),
+                anchor_lang::system_program::CreateAccount {
+                    from: ctx.accounts.payer.to_account_info(),
+                    to: ctx.accounts.extra_account_meta_list.to_account_info(),
+                },
+                signer_seeds,
+            ),
+            lamports,
+            account_data_size,
+            &ctx.program_id,
+        )?;
+
+        let mut data = ctx.accounts.extra_account_meta_list.try_borrow_mut_data()?;
+        ExtraAccountMetaList::init::<ExecuteInstruction>(&mut data, &account_metas)?;
+
+        Ok(())
+    }
+
+    // CORREGIDO: Usamos TransferHookInstruction::unpack para evitar la dependencia faltante
+    pub fn fallback<'info>(
+        program_id: &Pubkey,
+        accounts: &'info [AccountInfo<'info>],
+        data: &[u8],
+    ) -> Result<()> {
+        // Desempaquetamos la instrucción usando la interfaz estándar
+        let instruction = TransferHookInstruction::unpack(data)?;
+
+        // Verificamos si es la instrucción 'Execute'
+        match instruction {
+            TransferHookInstruction::Execute { amount: _ } => {
+                 let instruction_sysvar = accounts.iter().find(|a| a.key == &anchor_lang::solana_program::sysvar::instructions::ID);
+                 
+                 if let Some(ix_sysvar) = instruction_sysvar {
+                     let current_index = load_current_index_checked(ix_sysvar)?;
+                     let current_ix = load_instruction_at_checked(current_index as usize, ix_sysvar)?;
+                     
+                     // Permitir transferencias SOLO si la instrucción principal es de este programa
+                     if current_ix.program_id == *program_id {
+                         return Ok(());
+                     }
+                     
+                     return Err(ListError::TransferNotAllowed.into());
+                 }
+                 
+                 return Err(ListError::TransferNotAllowed.into());
+            },
+            _ => return Err(ProgramError::InvalidInstructionData.into())
+        }
+    }
 }
 
 /* ================= STATE ================= */
@@ -221,17 +306,11 @@ pub struct CampaignEscrowAuth {
     pub bump: u8,
 }
 
-/* ================= ACCOUNTS ================= */
+/* ================= CONTEXTS ================= */
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
-    #[account(
-        init,
-        payer = admin,
-        space = 8 + 32 + 8 + 1,
-        seeds = [b"state_v2"],
-        bump
-    )]
+    #[account(init, payer = admin, space = 8 + 32 + 8 + 1, seeds = [b"state"], bump)]
     pub state: Account<'info, State>,
     #[account(mut)]
     pub admin: Signer<'info>,
@@ -240,33 +319,33 @@ pub struct Initialize<'info> {
 
 #[derive(Accounts)]
 pub struct UpdatePrice<'info> {
-    #[account(mut, seeds = [b"state_v2"], bump)]
+    #[account(mut, seeds = [b"state"], bump)]
     pub state: Account<'info, State>,
     pub admin: Signer<'info>,
 }
 
 #[derive(Accounts)]
 pub struct BuyTokens<'info> {
-    #[account(seeds = [b"state_v2"], bump)]
+    #[account(mut, seeds = [b"state"], bump)]
     pub state: Account<'info, State>,
     #[account(mut)]
     pub buyer: Signer<'info>,
-    /// CHECK: treasury SOL wallet
+    /// CHECK: Treasury wallet
     #[account(mut)]
-    pub treasury: UncheckedAccount<'info>,
+    pub treasury: AccountInfo<'info>,
     #[account(mut)]
     pub mint: InterfaceAccount<'info, Mint>,
     #[account(mut)]
     pub buyer_token_account: InterfaceAccount<'info, TokenAccount>,
-    pub mint_authority: Signer<'info>,
+    /// CHECK: Mint authority (PDA)
+    #[account(seeds = [b"mint_auth"], bump)]
+    pub mint_authority: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
 pub struct DepositToEscrow<'info> {
-    #[account(seeds = [b"state_v2"], bump)]
-    pub state: Account<'info, State>,
     #[account(mut)]
     pub advertiser: Signer<'info>,
     #[account(
@@ -288,12 +367,10 @@ pub struct DepositToEscrow<'info> {
 
 #[derive(Accounts)]
 pub struct DepositToCampaignEscrow<'info> {
-    #[account(seeds = [b"state_v2"], bump)]
-    pub state: Account<'info, State>,
     #[account(mut)]
     pub advertiser: Signer<'info>,
-    /// CHECK: campaign identifier (arbitrary string used as seed, no data loaded)
-    pub campaign: UncheckedAccount<'info>,
+    /// CHECK: Campaign ID
+    pub campaign: AccountInfo<'info>,
     #[account(
         init_if_needed,
         payer = advertiser,
@@ -313,9 +390,15 @@ pub struct DepositToCampaignEscrow<'info> {
 
 #[derive(Accounts)]
 pub struct SettleClick<'info> {
-    #[account(seeds = [b"state_v2"], bump)]
+    #[account(seeds = [b"state"], bump)]
     pub state: Account<'info, State>,
     #[account(mut)]
+    pub admin: Signer<'info>, 
+    #[account(
+        mut,
+        seeds = [b"escrow", escrow_auth.advertiser.as_ref()],
+        bump = escrow_auth.bump
+    )]
     pub escrow_auth: Account<'info, EscrowAuth>,
     #[account(mut)]
     pub escrow_token_account: InterfaceAccount<'info, TokenAccount>,
@@ -326,9 +409,15 @@ pub struct SettleClick<'info> {
 
 #[derive(Accounts)]
 pub struct SettleClickCampaign<'info> {
-    #[account(seeds = [b"state_v2"], bump)]
+    #[account(seeds = [b"state"], bump)]
     pub state: Account<'info, State>,
     #[account(mut)]
+    pub admin: Signer<'info>,
+    #[account(
+        mut,
+        seeds = [b"campaign_escrow", campaign_escrow_auth.advertiser.as_ref(), campaign_escrow_auth.campaign.as_ref()],
+        bump = campaign_escrow_auth.bump
+    )]
     pub campaign_escrow_auth: Account<'info, CampaignEscrowAuth>,
     #[account(mut)]
     pub escrow_token_account: InterfaceAccount<'info, TokenAccount>,
@@ -337,18 +426,34 @@ pub struct SettleClickCampaign<'info> {
     pub token_program: Interface<'info, TokenInterface>,
 }
 
-/* ================= ERRORS ================= */
+#[derive(Accounts)]
+pub struct InitializeExtraAccountMetaList<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    /// CHECK: ExtraAccountMetaList PDA, init manually
+    #[account(
+        mut,
+        seeds = [b"extra-account-metas", mint.key().as_ref()],
+        bump
+    )]
+    pub extra_account_meta_list: AccountInfo<'info>,
+    pub mint: InterfaceAccount<'info, Mint>,
+    /// CHECK: System Program
+    pub system_program: Program<'info, System>,
+}
 
 #[error_code]
 pub enum ListError {
-    #[msg("Only admin can call this.")]
+    #[msg("You are not authorized to perform this action.")]
     Unauthorized,
-    #[msg("Invalid amount.")]
+    #[msg("The amount must be greater than zero.")]
     InvalidAmount,
-    #[msg("Amount too small.")]
+    #[msg("The amount is too small to mint any tokens.")]
     AmountTooSmall,
+    #[msg("Invalid mint authority.")]
+    InvalidMintAuthority,
     #[msg("Invalid escrow owner.")]
     InvalidEscrowOwner,
-    #[msg("Mint authority does not match.")]
-    InvalidMintAuthority,
+    #[msg("Transfer not allowed.")]
+    TransferNotAllowed,
 }

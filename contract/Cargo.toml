@@ -11,4 +11,3 @@ codegen-units = 1
 
 [patch.crates-io]
 constant_time_eq = { path = "deps/constant_time_eq" }
-indexmap = { path = "deps/indexmap_local" }
