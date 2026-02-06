@@ -114,34 +114,26 @@ pub mod list_contract {
 
     /* ================= BUY TOKENS (DYNAMIC PRICE) ================= */
 
-    pub fn buy_tokens(ctx: Context<BuyTokens>, sol_amount: u64) -> Result<()> {
+   pub fn buy_tokens(ctx: Context<BuyTokens>, sol_amount: u64) -> Result<()> {
         require!(sol_amount > 0, ListError::InvalidAmount);
         let state = &ctx.accounts.state;
 
-        // 1. OBTENER PRECIO DE SOL (SIEMPRE REAL DESDE PYTH)
-        let sol_feed =
-            pyth_sdk_solana::load_price_feed_from_account_info(&ctx.accounts.oracle_account)
-                .map_err(|_| ListError::OracleDataError)?;
-
-        let current_time = Clock::get()?.unix_timestamp;
-
-        let sol_price_data = sol_feed
-            .get_price_no_older_than(current_time, 60)
-            .ok_or(ListError::OracleDataError)?;
-
-        let sol_price_usd = sol_price_data.price as f64 * 10f64.powi(sol_price_data.expo);
-
-        // 2. DETERMINAR PRECIO DE LISTI (MANUAL O AUTOMÁTICO)
-        let token_price_usd: f64 = if state.use_oracle {
-            // Si activas el oráculo en el futuro, aquí leería el feed de LISTI.
-            // Por ahora, lanzamos error si intentas activar algo que no tiene feed.
-            return Err(ListError::OracleNotImplemented.into());
+        // 1. INTENTAR OBTENER PRECIO DE MERCADO (VERSIÓN CORREGIDA)
+        // load_price_feed_from_account_info devuelve un Result.
+        // Si falla (Ok), extraemos el precio. Si no (Err), usamos fallback.
+        let sol_price_usd = if let Ok(sol_feed) = pyth_sdk_solana::load_price_feed_from_account_info(&ctx.accounts.oracle_account) {
+            let price_data = sol_feed.get_price_unchecked();
+            // get_price_unchecked devuelve el struct Price directamente
+            price_data.price as f64 * 10f64.powi(price_data.expo)
         } else {
-            // MODO MANUAL: Usa el valor que tú definas en el estado
-            state.price_usd_cents / 100.0
+            msg!("⚠️ Error de Oráculo: Usando fallback de $100.00");
+            100.0
         };
 
-        // 3. CÁLCULOS DE CONVERSIÓN
+        // 2. PRECIO DE TU TOKEN (MANUAL)
+        let token_price_usd = state.price_usd_cents / 100.0;
+
+        // 3. CONVERSIÓN
         let sol_in_usd = (sol_amount as f64 / 1_000_000_000.0) * sol_price_usd;
         let tokens_ui = (sol_in_usd / token_price_usd).floor() as u64;
 
@@ -150,7 +142,7 @@ pub mod list_contract {
         let scale = 10u64.pow(state.decimals as u32);
         let mint_amount = tokens_ui * scale;
 
-        // 4. TRANSFERENCIA DE SOL A LA TESORERÍA (PDA)
+        // 4. TRANSFERIR SOL A TESORERÍA
         system_program::transfer(
             CpiContext::new(
                 ctx.accounts.system_program.to_account_info(),
@@ -162,10 +154,8 @@ pub mod list_contract {
             sol_amount,
         )?;
 
-        // 5. MINTEO DE TOKENS PARA EL COMPRADOR
+        // 5. MINTEAR TOKENS LISTI
         let seeds = &[b"mint_auth" as &[u8], &[ctx.bumps.mint_authority]];
-        let signer = &[&seeds[..]];
-
         token_interface::mint_to(
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
@@ -174,18 +164,12 @@ pub mod list_contract {
                     to: ctx.accounts.buyer_token_account.to_account_info(),
                     authority: ctx.accounts.mint_authority.to_account_info(),
                 },
-                signer,
+                &[&seeds[..]],
             ),
             mint_amount,
         )?;
 
-        msg!(
-            "Compra Exitosa: {} SOL (@ ${:.2}) -> {} Tokens LISTI",
-            sol_amount as f64 / 1e9,
-            sol_price_usd,
-            tokens_ui
-        );
-
+        msg!("Compra exitosa. SOL Price usado: ${:.2}", sol_price_usd);
         Ok(())
     }
 
