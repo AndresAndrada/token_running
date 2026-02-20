@@ -80,12 +80,12 @@ async function main() {
 
   await provider.sendAndConfirm(transaction);
   
-  console.log("------------------------------------------");
-  console.log("🎉 ¡SISTEMA LISTO PARA OPERAR!");
+  console.log("---------------------------------------");
+  console.log("🎉 SYSTEM READY TO OPERATE!");
   console.log("📍 STATE PDA:", statePda.toBase58());
-  console.log("📱 TOKEN_MINT:", mint.toBase58());
-  console.log("🔑 MINT_AUTHORITY (PDA):", mintAuthority.toBase58());
-  console.log("------------------------------------------");
+  console.log("📱 TOKEN MINT:", mint.toBase58());
+  console.log("🔑 MINT AUTHORITY (PDA):", mintAuthority.toBase58());
+  console.log("---------------------------------------");
 }
 
 main();

@@ -227,6 +227,25 @@ async function main() {
     const SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey("Sysvar1nstructions1111111111111111111111111");
 
     // Keys expected by DepositToEscrow
+    // REMAINING ACCOUNTS
+    // Try different orders if "An account required by the instruction is missing" persists.
+    // Standard expectation: [ExtraAccountMetaList, ...ExtraAccounts]
+    // On-chain ExtraAccounts: [Program, Sysvar]
+    
+    // Attempt 1: Standard [MetaList, Program, Sysvar]
+    // const remaining = [
+    //     { pubkey: extraAccountMetaListPDA, isSigner: false, isWritable: false },
+    //     { pubkey: PROGRAM_ID, isSigner: false, isWritable: false },
+    //     { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+    // ];
+
+    // Attempt 2: Put Program First? [Program, MetaList, Sysvar]
+    const remaining = [
+        { pubkey: PROGRAM_ID, isSigner: false, isWritable: false },
+        { pubkey: extraAccountMetaListPDA, isSigner: false, isWritable: false },
+        { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+    ];
+    
     const keys = [
         { pubkey: statePDA, isSigner: false, isWritable: true },
         { pubkey: wallet.publicKey, isSigner: true, isWritable: true }, // advertiser
@@ -236,11 +255,7 @@ async function main() {
         { pubkey: escrowATA, isSigner: false, isWritable: true }, // escrow_token_account
         { pubkey: TOKEN_2022_PROGRAM_ID, isSigner: false, isWritable: false },
         { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-        
-        // REMAINING ACCOUNTS
-        { pubkey: extraAccountMetaListPDA, isSigner: false, isWritable: false },
-        { pubkey: PROGRAM_ID, isSigner: false, isWritable: false },
-        { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+        ...remaining
     ];
 
     const depositIx = new TransactionInstruction({

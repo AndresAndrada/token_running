@@ -298,18 +298,18 @@ pub mod list_contract {
             TransferHookInstruction::Execute { amount: _ } => {
                 msg!("Hook executed. Accounts: {}", accounts.len());
 
-                // VALIDACIÓN: Solo permitir transferencias iniciadas por este programa
+                // VALIDATION: Only allow transfers initiated by this program
                 let instruction_sysvar = accounts
                     .iter()
                     .find(|a| a.key == &anchor_lang::solana_program::sysvar::instructions::ID);
 
                 if let Some(ix_sysvar) = instruction_sysvar {
-                    // FIX: Verificar la instrucción RAÍZ (Top-Level), no la actual (current_index)
-                    // Si el usuario llama a depositToEscrow, esa es la instrucción 0.
-                    // Si el usuario llama a transferChecked directo, esa es la instrucción 0.
+                    // FIX: Verify the ROOT instruction (Top-Level), not the current one (current_index)
+                    // If the user calls depositToEscrow, that is instruction 0.
+                    // If the user calls transferChecked directly, that is instruction 0.
                     let root_ix = load_instruction_at_checked(0, ix_sysvar)?;
 
-                    // Si la instrucción raíz es de este programa, permitir.
+                    // If the root instruction is from this program, allow.
                     if root_ix.program_id == *program_id {
                         msg!("Transfer allowed: Root instruction is our program.");
                         return Ok(());
@@ -508,16 +508,16 @@ pub struct CloseExtraAccountMetaList<'info> {
 
 #[error_code]
 pub enum ListError {
-    #[msg("No estás autorizado.")]
+    #[msg("You are not authorized.")]
     Unauthorized,
-    #[msg("Monto inválido.")]
+    #[msg("Invalid amount.")]
     InvalidAmount,
-    #[msg("Monto muy pequeño.")]
+    #[msg("Amount too small.")]
     AmountTooSmall,
-    #[msg("Transferencia bloqueada por Hook.")]
+    #[msg("Transfer blocked by Hook.")]
     TransferNotAllowed,
-    #[msg("Fondos insuficientes.")]
+    #[msg("Insufficient funds.")]
     InsufficientFunds,
-    #[msg("Error en datos de Pyth.")]
+    #[msg("Pyth data error.")]
     OracleDataError,
 }
