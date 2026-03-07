@@ -71,7 +71,7 @@
         {
           "name": "oracleFeed",
           "type": {
-            "option": "publicKey"
+            "option": "pubkey"
           }
         }
       ]
@@ -219,7 +219,7 @@
         },
         {
           "name": "escrowAuth",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -238,27 +238,17 @@
           "isSigner": false
         },
         {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "extraAccountMetaList",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "hookProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "instructionSysvar",
           "isMut": false,
           "isSigner": false
         }
@@ -301,6 +291,11 @@
         {
           "name": "mint",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mintAuthority",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -355,6 +350,11 @@
           "isSigner": false
         },
         {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -401,6 +401,11 @@
           "isSigner": false
         },
         {
+          "name": "mintAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -412,32 +417,6 @@
           "type": "u64"
         }
       ]
-    },
-    {
-      "name": "initializeExtraAccountMetaList",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "extraAccountMetaList",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     }
   ],
   "accounts": [
@@ -448,7 +427,7 @@
         "fields": [
           {
             "name": "admin",
-            "type": "publicKey"
+            "type": "pubkey"
           },
           {
             "name": "priceUsdCents",
@@ -460,7 +439,7 @@
           },
           {
             "name": "oracleFeed",
-            "type": "publicKey"
+            "type": "pubkey"
           },
           {
             "name": "decimals",
@@ -476,11 +455,11 @@
         "fields": [
           {
             "name": "advertiser",
-            "type": "publicKey"
+            "type": "pubkey"
           },
           {
             "name": "mint",
-            "type": "publicKey"
+            "type": "pubkey"
           },
           {
             "name": "bump",
@@ -496,15 +475,15 @@
         "fields": [
           {
             "name": "advertiser",
-            "type": "publicKey"
+            "type": "pubkey"
           },
           {
             "name": "campaign",
-            "type": "publicKey"
+            "type": "pubkey"
           },
           {
             "name": "mint",
-            "type": "publicKey"
+            "type": "pubkey"
           },
           {
             "name": "bump",
@@ -518,32 +497,27 @@
     {
       "code": 6000,
       "name": "Unauthorized",
-      "msg": "No estás autorizado."
+      "msg": "You are not authorized."
     },
     {
       "code": 6001,
       "name": "InvalidAmount",
-      "msg": "Monto inválido."
+      "msg": "Invalid amount."
     },
     {
       "code": 6002,
       "name": "AmountTooSmall",
-      "msg": "Monto muy pequeño."
+      "msg": "Amount too small."
     },
     {
       "code": 6003,
-      "name": "TransferNotAllowed",
-      "msg": "Transferencia bloqueada por Hook."
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds."
     },
     {
       "code": 6004,
-      "name": "InsufficientFunds",
-      "msg": "Fondos insuficientes."
-    },
-    {
-      "code": 6005,
       "name": "OracleDataError",
-      "msg": "Error en datos de Pyth."
+      "msg": "Pyth data error."
     }
   ]
 }

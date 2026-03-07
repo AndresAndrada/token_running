@@ -15,7 +15,7 @@ const wallet = Keypair.fromSecretKey(new Uint8Array(walletData));
 
 // Config
 const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-const MINT = new PublicKey("2QJbuhS284B4BbVUuEtKQEJXPPjAdfXysVT5qKRTZUia"); // From last run
+const MINT = new PublicKey("EXURUSEXwt17izMpL4b9o4eRAjDx3nYUGKGeVwHWNaSi"); // New Mint
 const PROGRAM_ID = new PublicKey("7zaZpVzVD6FPtQTKjt7Z4vi46sD5uB6YzTYZC1gNRo89"); // Hook Program
 const TOKEN_2022_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
 

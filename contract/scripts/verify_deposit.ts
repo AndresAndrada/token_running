@@ -26,7 +26,7 @@ import { sha256 } from "@noble/hashes/sha256";
 
 // --- CONFIGURACIÓN ---
 const WALLET_PATH = "c:\\Users\\Pc\\Desktop\\list-token\\contract\\phantom-admin.json";
-const PROGRAM_ID = new PublicKey("7zaZpVzVD6FPtQTKjt7Z4vi46sD5uB6YzTYZC1gNRo89");
+const PROGRAM_ID = new PublicKey("EqU2UP3TX9PXs5uAgU5LdKg361huEXjpWW59AvDD9wz6");
 const DECIMALS = 6;
 const MINT_AMOUNT = 1000 * 10 ** DECIMALS;
 const DEPOSIT_AMOUNT = 100 * 10 ** DECIMALS;

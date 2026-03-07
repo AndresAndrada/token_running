@@ -12,7 +12,7 @@ import {
 } from "@solana/spl-token";
 
 const MINT_ADDRESS = new PublicKey("5gtfs7iQseasXy6nfv1BLjjtBn4ZUgkwGa7NSpiCYSjq");
-const PROGRAM_ID = new PublicKey("7zaZpVzVD6FPtQTKjt7Z4vi46sD5uB6YzTYZC1gNRo89");
+const PROGRAM_ID = new PublicKey("EqU2UP3TX9PXs5uAgU5LdKg361huEXjpWW59AvDD9wz6");
 
 async function main() {
   const connection = new Connection("https://api.devnet.solana.com", "confirmed");

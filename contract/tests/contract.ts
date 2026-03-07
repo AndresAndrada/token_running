@@ -159,6 +159,7 @@ describe("list_contract (new)", () => {
         mint,
         buyerTokenAccount: buyerAta,
         mintAuthority: admin.publicKey,
+        oracleAccount: SystemProgram.programId, // Dummy account for fallback logic
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
@@ -186,6 +187,7 @@ describe("list_contract (new)", () => {
           mint,
           buyerTokenAccount: buyer.publicKey, // dummy
           mintAuthority: admin.publicKey,
+          oracleAccount: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
         })
@@ -209,6 +211,7 @@ describe("list_contract (new)", () => {
           mint,
           buyerTokenAccount: buyer.publicKey, // dummy
           mintAuthority: admin.publicKey,
+          oracleAccount: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
         })

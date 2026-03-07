@@ -1,16 +1,15 @@
 [toolchain]
 package_manager = "yarn"
-anchor_version = "0.30.1"
 
 [features]
-resolution = true
+seeds = false
 skip-lint = false
 
 [programs.localnet]
-list_contract = "7QcpGHW5VfPe2U2SoSqQhQmtqVMD1FLBeGxLLT2DxWpj"
+list_contract = "7QcpGHW5VfPe2U2SoSqQhQmtqVMD1FLBeGxLLT2DxWpj" 
 
 [programs.devnet]
-list_contract = "2NszZaqQu9zn6u51ionxw4MwiRURSaZ1px3bKrds8VAS"
+list_contract = "EqU2UP3TX9PXs5uAgU5LdKg361huEXjpWW59AvDD9wz6"
 
 [registry]
 url = "https://api.apr.dev"
@@ -32,3 +31,5 @@ checkMint = "yarn ts-node scripts/checkMint.ts"
 getMintAuthorityKey = "yarn ts-node scripts/getMintAuthorityKey.ts"
 initializeExtaAccountMetaList = "yarn ts-node scripts/3_initializeExtaAccountMetaList.ts"
 createMintWithMetadata = "yarn ts-node scripts/create_mint_with_metadata.ts"
+createcreateFrozenFintLocalMintWithMetadata = "yarn ts-node scripts/create_frozen_mint_local.ts"
+testSettleClick = "yarn ts-node scripts/test_settle_click.ts"
