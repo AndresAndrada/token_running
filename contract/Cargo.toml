@@ -4,14 +4,7 @@ members = [
 ]
 resolver = "2"
 
-[workspace.dependencies]
-wit-bindgen = "=0.19.0"
-spdx = "=0.10.6"
-
 [profile.release]
 overflow-checks = true
 lto = "fat"
 codegen-units = 1
-
-[patch.crates-io]
-constant_time_eq = { path = "deps/constant_time_eq" }

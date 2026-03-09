@@ -574,6 +574,7 @@ pub struct MintToAdmin<'info> {
     pub mint: InterfaceAccount<'info, Mint>,
     #[account(mut)]
     pub recipient: InterfaceAccount<'info, TokenAccount>,
+    /// CHECK: PDA used as mint/freeze authority, validated by seeds
     #[account(seeds = [b"mint_auth"], bump)]
     pub mint_authority: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -585,6 +586,7 @@ pub struct WithdrawSol<'info> {
     pub state: Account<'info, State>,
     #[account(mut)]
     pub admin: Signer<'info>,
+    /// CHECK: PDA used as treasury, validated by seeds
     #[account(mut, seeds = [b"mint_auth"], bump)]
     pub treasury: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
@@ -596,14 +598,17 @@ pub struct BuyTokens<'info> {
     pub state: Account<'info, State>,
     #[account(mut)]
     pub buyer: Signer<'info>,
+    /// CHECK: PDA used as treasury, validated by seeds
     #[account(mut, seeds = [b"mint_auth"], bump)]
     pub treasury: AccountInfo<'info>,
     #[account(mut)]
     pub mint: InterfaceAccount<'info, Mint>,
     #[account(mut)]
     pub buyer_token_account: InterfaceAccount<'info, TokenAccount>,
+    /// CHECK: PDA used as mint/freeze authority, validated by seeds
     #[account(seeds = [b"mint_auth"], bump)]
     pub mint_authority: AccountInfo<'info>,
+    /// CHECK: Pyth oracle price feed account, validated in instruction logic
     pub oracle_account: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
@@ -623,6 +628,7 @@ pub struct DepositToEscrow<'info> {
     pub advertiser_token_account: InterfaceAccount<'info, TokenAccount>,
     #[account(mut)]
     pub escrow_token_account: InterfaceAccount<'info, TokenAccount>,
+    /// CHECK: PDA used as mint/freeze authority, validated by seeds
     #[account(seeds = [b"mint_auth"], bump)]
     pub mint_authority: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -633,6 +639,7 @@ pub struct DepositToEscrow<'info> {
 pub struct DepositToCampaignEscrow<'info> {
     #[account(mut)]
     pub advertiser: Signer<'info>,
+    /// CHECK: Campaign identifier account, used only as PDA seed
     pub campaign: AccountInfo<'info>,
     #[account(init_if_needed, payer = advertiser, space = 8 + 32 + 32 + 32 + 1, seeds = [b"campaign_escrow", advertiser.key().as_ref(), campaign.key().as_ref()], bump)]
     pub campaign_escrow_auth: Account<'info, CampaignEscrowAuth>,
@@ -642,6 +649,7 @@ pub struct DepositToCampaignEscrow<'info> {
     pub escrow_token_account: InterfaceAccount<'info, TokenAccount>,
     #[account(mut)]
     pub mint: InterfaceAccount<'info, Mint>,
+    /// CHECK: PDA used as mint/freeze authority, validated by seeds
     #[account(seeds = [b"mint_auth"], bump)]
     pub mint_authority: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -662,6 +670,7 @@ pub struct SettleClick<'info> {
     pub publisher_token_account: InterfaceAccount<'info, TokenAccount>,
     #[account(mut)]
     pub mint: InterfaceAccount<'info, Mint>,
+    /// CHECK: PDA used as mint/freeze authority, validated by seeds
     #[account(seeds = [b"mint_auth"], bump)]
     pub mint_authority: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -681,6 +690,7 @@ pub struct SettleClickCampaign<'info> {
     pub publisher_token_account: InterfaceAccount<'info, TokenAccount>,
     #[account(mut)]
     pub mint: InterfaceAccount<'info, Mint>,
+    /// CHECK: PDA used as mint/freeze authority, validated by seeds
     #[account(seeds = [b"mint_auth"], bump)]
     pub mint_authority: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
