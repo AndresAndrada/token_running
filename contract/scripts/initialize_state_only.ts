@@ -5,13 +5,14 @@ import * as path from 'path';
 
 // --- CONFIGURATION ---
 const RPC_URL = 'https://api.devnet.solana.com';
-const PROGRAM_ID = new PublicKey('EqU2UP3TX9PXs5uAgU5LdKg361huEXjpWW59AvDD9wz6');
-const IDL = require('../../../listi-app/lib/solana/idl/contract.json'); // Use frontend IDL which has discriminators
+const PROGRAM_ID = new PublicKey('ELwSwoq1jWSYHWQLaE2JCvcKE5vj1WnmEhW94P46g3ed');
+const IDL = require('../target/idl/list_contract.json');
 
 // Keypair Paths
 const KEYPAIR_PATHS = [
+  path.join(__dirname, '../phantom-admin.json'),
+  path.join(__dirname, '../test-wallet.json'),
   path.join(__dirname, '../../keypairs/mint-authority.json'),
-  path.join(__dirname, '../test-wallet.json'), // Fallback
 ];
 
 function loadWallet(): Keypair {

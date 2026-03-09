@@ -6,31 +6,29 @@ package_manager = "yarn"
 seeds = false
 skip-lint = false
 
-[programs.localnet]
-list_contract = "7QcpGHW5VfPe2U2SoSqQhQmtqVMD1FLBeGxLLT2DxWpj" 
-
 [programs.devnet]
-list_contract = "EqU2UP3TX9PXs5uAgU5LdKg361huEXjpWW59AvDD9wz6"
+list_contract = "ELwSwoq1jWSYHWQLaE2JCvcKE5vj1WnmEhW94P46g3ed"
+
+[programs.localnet]
+list_contract = "7QcpGHW5VfPe2U2SoSqQhQmtqVMD1FLBeGxLLT2DxWpj"
 
 [registry]
 url = "https://api.apr.dev"
 
-
-# localnet or devnet
 [provider]
 cluster = "devnet"
 wallet = "./phantom-admin.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
-initialize = "yarn ts-node scripts/initialize.ts"
-read_state = "yarn ts-node scripts/read_state.ts"
-show-admin = "yarn ts-node scripts/show-admin.ts"
-getPDA = "yarn ts-node scripts/getPDA.ts"
-getTreasury = "yarn ts-node scripts/getTreasury.ts"
 checkMint = "yarn ts-node scripts/checkMint.ts"
-getMintAuthorityKey = "yarn ts-node scripts/getMintAuthorityKey.ts"
-initializeExtaAccountMetaList = "yarn ts-node scripts/3_initializeExtaAccountMetaList.ts"
 createMintWithMetadata = "yarn ts-node scripts/create_mint_with_metadata.ts"
 createcreateFrozenFintLocalMintWithMetadata = "yarn ts-node scripts/create_frozen_mint_local.ts"
+getMintAuthorityKey = "yarn ts-node scripts/getMintAuthorityKey.ts"
+getPDA = "yarn ts-node scripts/getPDA.ts"
+getTreasury = "yarn ts-node scripts/getTreasury.ts"
+initialize = "yarn ts-node scripts/initialize.ts"
+initializeExtaAccountMetaList = "yarn ts-node scripts/3_initializeExtaAccountMetaList.ts"
+read_state = "yarn ts-node scripts/read_state.ts"
+show-admin = "yarn ts-node scripts/show-admin.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 testSettleClick = "yarn ts-node scripts/test_settle_click.ts"

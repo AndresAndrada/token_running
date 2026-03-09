@@ -9,12 +9,11 @@ crate-type = ["cdylib", "lib"]
 name = "list_contract"
 
 [features]
-default = ["custom-heap", "no-entrypoint"]
+default = []
 cpi = ["no-entrypoint"]
 no-entrypoint = []
 no-idl = []
 no-log-ix-name = []
-custom-heap = []
 idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 
 [dependencies]
