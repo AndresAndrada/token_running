@@ -5,7 +5,7 @@ use anchor_spl::token_interface::{
     self, FreezeAccount, Mint, MintTo, ThawAccount, TokenAccount, TokenInterface,
 };
 
-declare_id!("ELwSwoq1jWSYHWQLaE2JCvcKE5vj1WnmEhW94P46g3ed");
+declare_id!("D6J4e2nQDFupaitnirnp7HerHw5zdpGwNyRvJUrVu7ji");
 
 #[program]
 pub mod list_contract {

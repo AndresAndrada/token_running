@@ -28,15 +28,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // --- CONFIGURATION ---
-const RPC_URL = 'https://api.devnet.solana.com';
-// Program ID from lib.rs
-const PROGRAM_ID = new PublicKey('ELwSwoq1jWSYHWQLaE2JCvcKE5vj1WnmEhW94P46g3ed');
+const RPC_URL = process.env.ANCHOR_PROVIDER_URL || 'https://api.mainnet-beta.solana.com';
+const PROGRAM_ID = new PublicKey('D6J4e2nQDFupaitnirnp7HerHw5zdpGwNyRvJUrVu7ji');
 
 // Keypair Paths
 const KEYPAIR_PATHS = [
-  path.join(__dirname, '../phantom-admin.json'),
-  path.join(__dirname, '../test-wallet.json'),
-  path.join(__dirname, '../../keypairs/mint-authority.json'),
+  path.join(__dirname, '../deploy-wallet.json'),
+  // path.join(__dirname, '../phantom-admin.json'),
 ];
 
 function loadWallet(): Keypair {
