@@ -1,4 +1,4 @@
-# token Runnign
+# Runnign token
 
 
 ## Devnet token
