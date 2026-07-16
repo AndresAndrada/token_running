@@ -2,7 +2,9 @@
   "license": "ISC",
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "find-devnet-mints": "ts-node scripts/findDevnetMintsForProgram.ts",
+    "find-mainnet-mints": "ts-node scripts/findMainnetMintsForProgram.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.32.1",

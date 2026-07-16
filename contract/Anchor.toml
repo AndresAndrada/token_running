@@ -19,12 +19,14 @@ list_contract = "7QcpGHW5VfPe2U2SoSqQhQmtqVMD1FLBeGxLLT2DxWpj"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "https://solana-mainnet.g.alchemy.com/v2/olUaug5e7HLKLIeYPBlUH"
+cluster = "devnet"
 wallet = "./deploy-wallet.json"
 
 [scripts]
 initialize = "yarn ts-node scripts/1_initialize.ts"
 createTokenFrozen = "yarn ts-node scripts/2_create_frozen_mint_local.ts"
+mintToAdmin = "yarn ts-node scripts/test_mint_to_admin.ts"
+findMainnetMintsForProgram = "yarn ts-node scripts/findMainnetMintsForProgram.ts"
 
 checkMint = "yarn ts-node scripts/checkMint.ts"
 initializeExtaAccountMetaList = "yarn ts-node scripts/3_initializeExtaAccountMetaList.ts"
@@ -35,4 +37,5 @@ getPDA = "yarn ts-node scripts/getPDA.ts"
 getTreasury = "yarn ts-node scripts/getTreasury.ts"
 testSettleClick = "yarn ts-node scripts/test_settle_click.ts"
 balance = "yarn ts-node check_deploy_balance.ts"
+
 

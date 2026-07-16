@@ -7,3 +7,4 @@ test-ledger
 .yarn
 admin.json
 phantom-admin.json
+.env
